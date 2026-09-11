@@ -1,4 +1,6 @@
 # Go SDK for Open Workflow
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-workflow-specification%2Fsdk-go.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-workflow-specification%2Fsdk-go?ref=badge_shield)
+
 
 The Go SDK for Open Workflow provides strongly-typed structures for the [Open Workflow specification](https://github.com/open-workflow-specification/specification/blob/v1.0.0/schema/workflow.yaml). It simplifies parsing, validating, and interacting with workflows in Go. Starting from version `v3.1.0`, the SDK also includes a partial reference implementation, allowing users to execute workflows directly within their Go applications.
 
@@ -213,3 +215,7 @@ brew install diffutils
 Contributions are greatly appreciated! Check [this EPIC](https://github.com/open-workflow-specification/sdk-go/issues/221) and contribute to completing more features.
 
 Happy coding!
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopen-workflow-specification%2Fsdk-go.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopen-workflow-specification%2Fsdk-go?ref=badge_large)

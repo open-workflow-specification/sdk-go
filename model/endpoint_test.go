@@ -33,7 +33,7 @@ func TestEndpoint_UnmarshalJSON(t *testing.T) {
 	})
 
 	t.Run("Invalid RuntimeExpression", func(t *testing.T) {
-		input := `"123invalid-expression"`
+		input := `"${invalid-expression"`
 		var endpoint Endpoint
 		err := json.Unmarshal([]byte(input), &endpoint)
 
@@ -43,7 +43,7 @@ func TestEndpoint_UnmarshalJSON(t *testing.T) {
 
 	t.Run("Invalid LiteralUriTemplate", func(t *testing.T) {
 		uriTemplate := &LiteralUriTemplate{Value: "example.com/{id}"}
-		assert.False(t, LiteralUriPattern.MatchString(uriTemplate.Value), "LiteralUriTemplate should not match URI pattern")
+		assert.False(t, isLiteralUriValid(uriTemplate.Value), "LiteralUriTemplate should not match URI pattern")
 	})
 
 	t.Run("Valid URITemplate", func(t *testing.T) {

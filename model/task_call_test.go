@@ -486,3 +486,123 @@ func TestCallFunction_UnmarshalJSON(t *testing.T) {
 	}
 	assert.Equal(t, expectedWith, callFunction.With)
 }
+
+func TestCallMCP_MarshalJSON(t *testing.T) {
+	callMCP := CallMCP{
+		Call: "mcp",
+		With: MCPArguments{
+			Method: "tools/call",
+			Parameters: &ObjectOrRuntimeExpr{
+				Value: map[string]interface{}{
+					"name": "calc",
+				},
+			},
+			Transport: &McpCallTransport{
+				Stdio: &McpStdioTransport{
+					Command:   "npx",
+					Arguments: []string{"server@latest"},
+				},
+			},
+		},
+	}
+
+	data, err := json.Marshal(callMCP)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{
+		"call": "mcp",
+		"with": {
+			"method": "tools/call",
+			"parameters": {
+				"name": "calc"
+			},
+			"transport": {
+				"stdio": {
+					"command": "npx",
+					"arguments": ["server@latest"]
+				}
+			}
+		}
+	}`, string(data))
+}
+
+func TestCallMCP_UnmarshalJSON(t *testing.T) {
+	jsonData := `{
+		"call": "mcp",
+		"with": {
+			"method": "tools/call",
+			"parameters": {
+				"name": "calc"
+			},
+			"transport": {
+				"stdio": {
+					"command": "npx",
+					"arguments": ["server@latest"]
+				}
+			}
+		}
+	}`
+
+	var callMCP CallMCP
+	err := json.Unmarshal([]byte(jsonData), &callMCP)
+	assert.NoError(t, err)
+	assert.Equal(t, "mcp", callMCP.Call)
+	assert.Equal(t, "tools/call", callMCP.With.Method)
+	assert.NotNil(t, callMCP.With.Transport.Stdio)
+	assert.Equal(t, "npx", callMCP.With.Transport.Stdio.Command)
+	assert.Equal(t, []string{"server@latest"}, callMCP.With.Transport.Stdio.Arguments)
+
+	err = validate.Struct(callMCP)
+	assert.NoError(t, err)
+}
+
+func TestCallA2A_MarshalJSON(t *testing.T) {
+	callA2A := CallA2A{
+		Call: "a2a",
+		With: A2AArguments{
+			Method: "message/send",
+			Server: NewEndpoint("http://agent.example.com"),
+			Parameters: &ObjectOrRuntimeExpr{
+				Value: map[string]interface{}{
+					"text": "Hello",
+				},
+			},
+		},
+	}
+
+	data, err := json.Marshal(callA2A)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{
+		"call": "a2a",
+		"with": {
+			"method": "message/send",
+			"server": "http://agent.example.com",
+			"parameters": {
+				"text": "Hello"
+			}
+		}
+	}`, string(data))
+}
+
+func TestCallA2A_UnmarshalJSON(t *testing.T) {
+	jsonData := `{
+		"call": "a2a",
+		"with": {
+			"method": "message/send",
+			"server": "http://agent.example.com",
+			"parameters": {
+				"text": "Hello"
+			}
+		}
+	}`
+
+	var callA2A CallA2A
+	err := json.Unmarshal([]byte(jsonData), &callA2A)
+	assert.NoError(t, err)
+	assert.Equal(t, "a2a", callA2A.Call)
+	assert.Equal(t, "message/send", callA2A.With.Method)
+	assert.NotNil(t, callA2A.With.Server)
+	assert.Equal(t, "http://agent.example.com", callA2A.With.Server.String())
+
+	err = validate.Struct(callA2A)
+	assert.NoError(t, err)
+}

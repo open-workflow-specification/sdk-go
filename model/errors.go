@@ -57,7 +57,34 @@ type ErrorFilter struct {
 	Status   int    `json:"status,omitempty"`
 	Instance string `json:"instance,omitempty"`
 	Title    string `json:"title,omitempty"`
-	Details  string `json:"details,omitempty"`
+	Detail   string `json:"detail,omitempty"`
+	Details  string `json:"details,omitempty"` // Deprecated: Use Detail instead.
+}
+
+func (ef *ErrorFilter) GetDetail() string {
+	if ef == nil {
+		return ""
+	}
+	if ef.Detail != "" {
+		return ef.Detail
+	}
+	return ef.Details
+}
+
+func (ef *ErrorFilter) UnmarshalJSON(data []byte) error {
+	type Alias ErrorFilter
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(ef),
+	}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+	if ef.Detail == "" && ef.Details != "" {
+		ef.Detail = ef.Details
+	}
+	return nil
 }
 
 func (e *Error) Error() string {

@@ -29,6 +29,7 @@ type Workflow struct {
 	Timeout  *TimeoutOrReference `json:"timeout,omitempty" yaml:"timeout,omitempty"`
 	Output   *Output             `json:"output,omitempty" yaml:"output,omitempty"`
 	Schedule *Schedule           `json:"schedule,omitempty" yaml:"schedule,omitempty"`
+	Evaluate *Evaluate           `json:"evaluate,omitempty" yaml:"evaluate,omitempty"`
 }
 
 // AsMap converts the Workflow struct into a JSON Map object.
@@ -67,6 +68,9 @@ func (w *Workflow) MarshalYAML() (interface{}, error) {
 	}
 	if w.Schedule != nil {
 		data["schedule"] = w.Schedule
+	}
+	if w.Evaluate != nil {
+		data["evaluate"] = w.Evaluate
 	}
 
 	return data, nil
@@ -108,6 +112,13 @@ type Schedule struct {
 	Cron  string                    `json:"cron,omitempty" validate:"omitempty"`
 	After *Duration                 `json:"after,omitempty" validate:"omitempty"`
 	On    *EventConsumptionStrategy `json:"on,omitempty" validate:"omitempty"`
+	Read  string                    `json:"read,omitempty" validate:"omitempty,oneof=data envelope raw"`
+}
+
+// Evaluate configures the workflow's runtime expression evaluation.
+type Evaluate struct {
+	Language string `json:"language,omitempty" yaml:"language,omitempty"`
+	Mode     string `json:"mode,omitempty" yaml:"mode,omitempty" validate:"omitempty,oneof=strict loose"`
 }
 
 const DefaultSchema = "json"

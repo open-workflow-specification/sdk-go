@@ -427,6 +427,17 @@ func TestForTaskRunner_Run(t *testing.T) {
 		runWorkflowTest(t, workflowPath, input, expectedOutput)
 	})
 
+	t.Run("Inline Array", func(t *testing.T) {
+		workflowPath := "./testdata/for_inline_array.yaml"
+		input := map[string]interface{}{
+			"sum": 0,
+		}
+		expectedOutput := map[string]interface{}{
+			"sum": float64(6),
+		}
+		runWorkflowTest(t, workflowPath, input, expectedOutput)
+	})
+
 }
 
 func TestSwitchTaskRunner_Run(t *testing.T) {

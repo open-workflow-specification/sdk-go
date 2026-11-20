@@ -102,7 +102,7 @@ func TestURITemplateOrRuntimeExprValidation(t *testing.T) {
 		{
 			Name: "Invalid URI format",
 			Input: &URITemplateOrRuntimeExpr{
-				Value: &LiteralUri{Value: "invalid-uri"},
+				Value: &LiteralUri{Value: "invalid uri with spaces"},
 			},
 			ShouldErr: true,
 		},

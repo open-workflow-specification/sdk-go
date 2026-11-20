@@ -17,6 +17,7 @@ package model
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -56,14 +57,14 @@ func init() {
 		if !ok {
 			return false
 		}
-		return LiteralUriPattern.MatchString(value)
+		return isLiteralUriValid(value)
 	})
 	registerValidator("uri_template_pattern", func(fl validator.FieldLevel) bool {
 		value, ok := fl.Field().Interface().(string)
 		if !ok {
 			return false
 		}
-		return LiteralUriTemplatePattern.MatchString(value)
+		return isLiteralUriTemplateValid(value)
 	})
 	registerValidator("semver_pattern", validateSemanticVersion)
 	registerValidator("iso8601_duration", validateISO8601Duration)
@@ -73,6 +74,8 @@ func init() {
 	registerValidator("string_or_runtime_expr", validateStringOrRuntimeExpr)
 	registerValidator("uri_template_or_runtime_expr", validateURITemplateOrRuntimeExpr)
 	registerValidator("json_pointer_or_runtime_expr", validateJsonPointerOrRuntimeExpr)
+	registerValidator("for_in", validateForIn)
+	registerValidator("mcp_transport", validateMcpTransport)
 
 	registerValidator("switch_item", validateSwitchItem)
 	validate.RegisterStructValidation(validateTaskItem, TaskItem{})
@@ -107,6 +110,10 @@ func validateTaskItem(sl validator.StructLevel) {
 	case *CallGRPC:
 		validateConcreteTask(sl, t, "Task")
 	case *CallAsyncAPI:
+		validateConcreteTask(sl, t, "Task")
+	case *CallA2A:
+		validateConcreteTask(sl, t, "Task")
+	case *CallMCP:
 		validateConcreteTask(sl, t, "Task")
 	case *CallFunction:
 		validateConcreteTask(sl, t, "Task")
@@ -317,29 +324,60 @@ func validateURITemplateOrRuntimeExpr(fl validator.FieldLevel) bool {
 
 	switch v := value.(type) {
 	case LiteralUri:
-		return LiteralUriPattern.MatchString(v.String())
+		return isLiteralUriValid(v.String())
+	case *LiteralUri:
+		if v == nil {
+			return false
+		}
+		return isLiteralUriValid(v.String())
 	case LiteralUriTemplate:
-		return LiteralUriTemplatePattern.MatchString(v.String())
+		return isLiteralUriTemplateValid(v.String())
+	case *LiteralUriTemplate:
+		if v == nil {
+			return false
+		}
+		return isLiteralUriTemplateValid(v.String())
 	case RuntimeExpression:
 		return v.IsValid()
+	case *RuntimeExpression:
+		if v == nil {
+			return false
+		}
+		return v.IsValid()
 	case string:
-		// Check if the string is a valid URI
-		if LiteralUriPattern.MatchString(v) {
+		if isLiteralUriValid(v) || isLiteralUriTemplateValid(v) {
 			return true
 		}
-
-		// Check if the string is a valid URI Template
-		if LiteralUriTemplatePattern.MatchString(v) {
-			return true
-		}
-
-		// Check if the string is a valid RuntimeExpression
 		expression := RuntimeExpression{Value: v}
 		return expression.IsValid()
 	default:
 		fmt.Printf("Unsupported type in URITemplateOrRuntimeExpr.Value: %T\n", v)
 		return false
 	}
+}
+
+func validateMcpTransport(fl validator.FieldLevel) bool {
+	value := fl.Field().Interface()
+	var transport McpCallTransport
+	if t, ok := value.(McpCallTransport); ok {
+		transport = t
+	} else if t, ok := value.(*McpCallTransport); ok {
+		if t == nil {
+			return false
+		}
+		transport = *t
+	} else {
+		return false
+	}
+
+	count := 0
+	if transport.HTTP != nil {
+		count++
+	}
+	if transport.Stdio != nil {
+		count++
+	}
+	return count == 1
 }
 
 func validateJsonPointerOrRuntimeExpr(fl validator.FieldLevel) bool {
@@ -354,6 +392,35 @@ func validateJsonPointerOrRuntimeExpr(fl validator.FieldLevel) bool {
 		return v.IsValid()
 	default:
 		return false // Unsupported types.
+	}
+}
+
+func validateForIn(fl validator.FieldLevel) bool {
+	value := fl.Field().Interface()
+
+	if forIn, ok := value.(*ForIn); ok {
+		if forIn == nil {
+			return false
+		}
+		value = forIn.Value
+	} else if forIn, ok := value.(ForIn); ok {
+		value = forIn.Value
+	}
+
+	if value == nil {
+		return false
+	}
+
+	switch v := value.(type) {
+	case string:
+		return strings.TrimSpace(v) != ""
+	case RuntimeExpression:
+		return v.IsValid()
+	case []interface{}:
+		return true
+	default:
+		rv := reflect.ValueOf(value)
+		return rv.Kind() == reflect.Slice || rv.Kind() == reflect.Array
 	}
 }
 

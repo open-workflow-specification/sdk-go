@@ -38,6 +38,7 @@ type TryTaskCatch struct {
 	When       *RuntimeExpression `json:"when,omitempty"`
 	ExceptWhen *RuntimeExpression `json:"exceptWhen,omitempty"`
 	Retry      *RetryPolicy       `json:"retry,omitempty"`
+	Then       *FlowDirective     `json:"then,omitempty"`
 	Do         *TaskList          `json:"do,omitempty" validate:"omitempty,dive"`
 }
 

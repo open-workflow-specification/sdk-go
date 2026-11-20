@@ -12,7 +12,7 @@ goimports:
 
 lint:
 	@echo "🚀 Installing/updating golangci-lint…"
-	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	GO111MODULE=on go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 	@echo "🚀 Running lint…"
 	@make addheaders

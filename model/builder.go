@@ -83,6 +83,12 @@ func (wb *WorkflowBuilder) SetSchedule(schedule *Schedule) *WorkflowBuilder {
 	return wb
 }
 
+// SetEvaluate sets the Evaluate for the Workflow.
+func (wb *WorkflowBuilder) SetEvaluate(evaluate *Evaluate) *WorkflowBuilder {
+	wb.workflow.Evaluate = evaluate
+	return wb
+}
+
 // Build returns the constructed Workflow object.
 func (wb *WorkflowBuilder) Build() *Workflow {
 	return wb.workflow

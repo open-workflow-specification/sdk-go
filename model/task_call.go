@@ -123,9 +123,67 @@ type AsyncAPIMessageConsumptionPolicy struct {
 	Until  *RuntimeExpression `json:"until,omitempty" validate:"required_without_all=Amount While"`
 }
 
+type CallA2A struct {
+	TaskBase `json:",inline"`
+	Call     string       `json:"call" validate:"required,eq=a2a"`
+	With     A2AArguments `json:"with" validate:"required"`
+}
+
+func (c *CallA2A) GetBase() *TaskBase {
+	return &c.TaskBase
+}
+
+type A2AArguments struct {
+	AgentCard  *ExternalResource    `json:"agentCard,omitempty"`
+	Server     *Endpoint            `json:"server,omitempty"`
+	Method     string               `json:"method" validate:"required,oneof='message/send' 'message/stream' 'tasks/get' 'tasks/list' 'tasks/cancel' 'tasks/resubscribe' 'tasks/pushNotificationConfig/set' 'tasks/pushNotificationConfig/get' 'tasks/pushNotificationConfig/list' 'tasks/pushNotificationConfig/delete' 'agent/getAuthenticatedExtendedCard'"`
+	Parameters *ObjectOrRuntimeExpr `json:"parameters,omitempty"`
+}
+
+type CallMCP struct {
+	TaskBase `json:",inline"`
+	Call     string       `json:"call" validate:"required,eq=mcp"`
+	With     MCPArguments `json:"with" validate:"required"`
+}
+
+func (c *CallMCP) GetBase() *TaskBase {
+	return &c.TaskBase
+}
+
+type MCPArguments struct {
+	ProtocolVersion string               `json:"protocolVersion,omitempty"`
+	Method          string               `json:"method" validate:"required,oneof='tools/list' 'tools/call' 'prompts/list' 'prompts/get' 'resources/list' 'resources/read' 'resources/templates/list'"`
+	Parameters      *ObjectOrRuntimeExpr `json:"parameters,omitempty"`
+	Timeout         *Duration            `json:"timeout,omitempty"`
+	Transport       *McpCallTransport    `json:"transport" validate:"required,mcp_transport"`
+	Client          *McpClient           `json:"client,omitempty"`
+}
+
+type McpCallTransport struct {
+	HTTP    *McpHttpTransport  `json:"http,omitempty"`
+	Stdio   *McpStdioTransport `json:"stdio,omitempty"`
+	Options map[string]string  `json:"options,omitempty"`
+}
+
+type McpHttpTransport struct {
+	Endpoint *Endpoint         `json:"endpoint" validate:"required"`
+	Headers  map[string]string `json:"headers,omitempty"`
+}
+
+type McpStdioTransport struct {
+	Command     string            `json:"command" validate:"required"`
+	Arguments   []string          `json:"arguments,omitempty"`
+	Environment map[string]string `json:"environment,omitempty"`
+}
+
+type McpClient struct {
+	Name    string `json:"name" validate:"required"`
+	Version string `json:"version" validate:"required"`
+}
+
 type CallFunction struct {
 	TaskBase `json:",inline"`       // Inline TaskBase fields
-	Call     string                 `json:"call" validate:"required"`
+	Call     string                 `json:"call" validate:"required,ne=http,ne=openapi,ne=grpc,ne=asyncapi,ne=a2a,ne=mcp"`
 	With     map[string]interface{} `json:"with,omitempty"`
 }
 

@@ -37,7 +37,7 @@ func TestForTask_UnmarshalJSON(t *testing.T) {
 	err := json.Unmarshal([]byte(jsonData), &forTask)
 	assert.NoError(t, err)
 	assert.Equal(t, "item", forTask.For.Each)
-	assert.Equal(t, "${items}", forTask.For.In)
+	assert.Equal(t, "${items}", forTask.For.In.AsString())
 	assert.Equal(t, "index", forTask.For.At)
 	assert.Equal(t, "${condition}", forTask.While)
 
@@ -59,7 +59,7 @@ func TestForTask_MarshalJSON(t *testing.T) {
 		TaskBase: TaskBase{},
 		For: ForTaskConfiguration{
 			Each: "item",
-			In:   "${items}",
+			In:   NewForIn("${items}"),
 			At:   "index",
 		},
 		While: "${condition}",
@@ -98,7 +98,7 @@ func TestForTask_Validation(t *testing.T) {
 		TaskBase: TaskBase{},
 		For: ForTaskConfiguration{
 			Each: "item",
-			In:   "${items}",
+			In:   NewForIn("${items}"),
 			At:   "index",
 		},
 		While: "${condition}",
@@ -148,4 +148,32 @@ do:
 
 	err = validate.Struct(forTask)
 	assert.NoError(t, err, "Failed to validate ForTask")
+}
+
+func TestForTask_InlineArray_UnmarshalAndValidation(t *testing.T) {
+	t.Run("Primitive array", func(t *testing.T) {
+		rawYaml := "for:\n  each: number\n  in:\n    - 1\n    - 2\n    - 3\ndo:\n  - add:\n      set:\n        sum: '${ .sum + $number }'\n"
+		var forTask ForTask
+		err := yaml.Unmarshal([]byte(rawYaml), &forTask)
+		assert.NoError(t, err)
+		assert.NotNil(t, forTask.For.In)
+		assert.Equal(t, "number", forTask.For.Each)
+		assert.Equal(t, []interface{}{float64(1), float64(2), float64(3)}, forTask.For.In.AsSlice())
+
+		err = validate.Struct(forTask)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Object array", func(t *testing.T) {
+		rawYaml := "for:\n  each: color\n  in:\n    - name: red\n      hex: '#FF0000'\n    - name: green\n      hex: '#00FF00'\ndo:\n  - log:\n      set:\n        logged: true\n"
+		var forTask ForTask
+		err := yaml.Unmarshal([]byte(rawYaml), &forTask)
+		assert.NoError(t, err)
+		assert.NotNil(t, forTask.For.In)
+		assert.Equal(t, "color", forTask.For.Each)
+		assert.Len(t, forTask.For.In.AsSlice(), 2)
+
+		err = validate.Struct(forTask)
+		assert.NoError(t, err)
+	})
 }

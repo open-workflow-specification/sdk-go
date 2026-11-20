@@ -244,7 +244,7 @@ func TestSchemaValidation(t *testing.T) {
 				"resource": {
 					"name": "external-schema",
 					"endpoint": {
-						"uri": "not-a-valid-url"
+						"uri": "not a valid url with spaces"
 					}
 				}
 			}`,

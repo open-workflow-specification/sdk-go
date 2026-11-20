@@ -112,9 +112,9 @@ func (o *OAuth2AuthenticationPolicy) MarshalJSON() ([]byte, error) {
 }
 
 type OAuth2AuthenticationProperties struct {
-	Authority URITemplate                     `json:"authority,omitempty"`
-	Grant     OAuth2AuthenticationDataGrant   `json:"grant,omitempty" validate:"oneof='authorization_code' 'client_credentials' 'password' 'refresh_token' 'urn:ietf:params:oauth:grant-type:token-exchange'"`
-	Client    *OAuth2AutenthicationDataClient `json:"client,omitempty"`
+	Authority URITemplate                     `json:"authority,omitempty" validate:"required"`
+	Grant     OAuth2AuthenticationDataGrant   `json:"grant,omitempty" validate:"required,oneof='authorization_code' 'client_credentials' 'password' 'refresh_token' 'urn:ietf:params:oauth:grant-type:token-exchange'"`
+	Client    *OAuth2AuthenticationDataClient `json:"client,omitempty"`
 	Request   *OAuth2TokenRequest             `json:"request,omitempty"`
 	Issuers   []string                        `json:"issuers,omitempty"`
 	Scopes    []string                        `json:"scopes,omitempty"`
@@ -179,13 +179,16 @@ const (
 	EncodingTypeApplicationJson OAuth2TokenRequestEncodingType = "application/json"
 )
 
-// OAuth2AutenthicationDataClient The definition of an OAuth2 client.
-type OAuth2AutenthicationDataClient struct {
+// OAuth2AuthenticationDataClient The definition of an OAuth2 client.
+type OAuth2AuthenticationDataClient struct {
 	ID             string                        `json:"id,omitempty"`
 	Secret         string                        `json:"secret,omitempty"`
 	Assertion      string                        `json:"assertion,omitempty"`
 	Authentication OAuthClientAuthenticationType `json:"authentication,omitempty" validate:"client_auth_type"`
 }
+
+// OAuth2AutenthicationDataClient is a type alias for backward compatibility.
+type OAuth2AutenthicationDataClient = OAuth2AuthenticationDataClient
 
 type OAuth2TokenRequest struct {
 	Encoding OAuth2TokenRequestEncodingType `json:"encoding" validate:"encoding_type"`

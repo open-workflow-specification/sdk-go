@@ -66,8 +66,10 @@ type Script struct {
 
 type Shell struct {
 	Command     string            `json:"command" validate:"required"`
-	Arguments   *RunArguments     `json:"arguments,omitempty"`
+	Arguments   []string          `json:"arguments,omitempty"`
 	Environment map[string]string `json:"environment,omitempty"`
+	Directory   string            `json:"directory,omitempty"`
+	Input       string            `json:"stdin,omitempty"`
 }
 
 type RunWorkflow struct {

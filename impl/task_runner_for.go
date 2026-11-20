@@ -57,7 +57,11 @@ func (f *ForTaskRunner) Run(input interface{}, taskSupport TaskSupport) (interfa
 		taskSupport.RemoveLocalExprVars(f.Task.For.Each, f.Task.For.At)
 	}()
 	f.sanitizeFor()
-	in, err := expr.TraverseAndEvaluate(f.Task.For.In, input, taskSupport.GetContext())
+	var inValue interface{}
+	if f.Task.For.In != nil {
+		inValue = f.Task.For.In.GetValue()
+	}
+	in, err := expr.TraverseAndEvaluate(inValue, input, taskSupport.GetContext())
 	if err != nil {
 		return nil, err
 	}

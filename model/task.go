@@ -211,6 +211,8 @@ func init() {
 		"call_openapi":  func() Task { return &CallOpenAPI{} },
 		"call_grpc":     func() Task { return &CallGRPC{} },
 		"call_asyncapi": func() Task { return &CallAsyncAPI{} },
+		"call_a2a":      func() Task { return &CallA2A{} },
+		"call_mcp":      func() Task { return &CallMCP{} },
 		"call":          func() Task { return &CallFunction{} },
 		"do":            func() Task { return &DoTask{} },
 		"fork":          func() Task { return &ForkTask{} },
@@ -372,6 +374,28 @@ func (ti *TaskItem) AsCallAsyncAPITask() *CallAsyncAPI {
 		return nil
 	}
 	if task, ok := ti.Task.(*CallAsyncAPI); ok {
+		return task
+	}
+	return nil
+}
+
+// AsCallA2ATask casts the Task to a CallA2A task if possible, returning nil if the cast fails.
+func (ti *TaskItem) AsCallA2ATask() *CallA2A {
+	if ti == nil {
+		return nil
+	}
+	if task, ok := ti.Task.(*CallA2A); ok {
+		return task
+	}
+	return nil
+}
+
+// AsCallMCPTask casts the Task to a CallMCP task if possible, returning nil if the cast fails.
+func (ti *TaskItem) AsCallMCPTask() *CallMCP {
+	if ti == nil {
+		return nil
+	}
+	if task, ok := ti.Task.(*CallMCP); ok {
 		return task
 	}
 	return nil

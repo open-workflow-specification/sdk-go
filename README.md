@@ -52,6 +52,7 @@ This table indicates the current state of implementation of various SDK features
 | [v2.5.0](https://github.com/open-workflow-specification/sdk-go/releases/tag/v2.5.0) |      [v0.8](https://github.com/open-workflow-specification/specification/tree/0.8.x)       |
 | [v3.4.0](https://github.com/open-workflow-specification/sdk-go/releases/tag/v3.4.0) | [v1.0.0](https://github.com/open-workflow-specification/specification/releases/tag/v1.0.0) |
 | [v4.0.0](https://github.com/open-workflow-specification/sdk-go/releases/tag/v4.0.0) | [v1.0.0](https://github.com/open-workflow-specification/specification/releases/tag/v1.0.0) |
+| [v4.1.0](https://github.com/open-workflow-specification/sdk-go/releases/tag/v4.1.0) | [v1.0.0](https://github.com/open-workflow-specification/specification/releases/tag/v1.1.0) |
 
 ---
 
